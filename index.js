@@ -1,9 +1,12 @@
-const fnl_scraper = require('./fnl_scraper');
+const fnl_scraper = require("./fnl_scraper");
+const productCypher = require("./utils/productCypher");
+const SEARCH_STR = '1/2" - 2" FHN';
+const BOUNDARY = null;
 
 (async () => {
-    await fnl_scraper.initialize('1%2F2"%20FHN&fsi=1');
+    await fnl_scraper.initialize(productCypher(SEARCH_STR));
 
-    let results = await fnl_scraper.getResults('anchor');
+    let results = await fnl_scraper.getResults(BOUNDARY);
 
     debugger;
 })();

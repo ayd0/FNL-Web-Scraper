@@ -1,6 +1,5 @@
 // TODO: 
-//       - convert fnl string to search string
-//       - convert results to XML format and POST to
+//       - convert results to XML format and POST
 //       - certify location updated
 
 const puppeteer = require("puppeteer");
@@ -8,6 +7,7 @@ const puppeteer = require("puppeteer");
 const MAIN_PAGE = "https://fastenal.com/";
 const LOC_PAGE = `${MAIN_PAGE}/locations/details/WAFER`;
 const PART_DESCRIPTION = (fnl) => `${MAIN_PAGE}product?query=${fnl}`;
+const EXPRESS_SRC = `${MAIN_PAGE}catalog/static/3a364d147bed98729cc3.png`;
 
 const self = {
     browser: null,
@@ -25,6 +25,7 @@ const self = {
         await self.setExpressIndicator();
     },
     postLoc: async () => {
+        console.log('updating location...')
         self.page = await self.browser.newPage();
         await self.page.goto(LOC_PAGE, {
             waitUntil: "networkidle0",
@@ -32,13 +33,14 @@ const self = {
         await self.page.click(".js-setStore", {
             waitUntil: "networkidle0",
         });
+        console.log('location updated')
     },
     setExpressIndicator: async () => {
         await self.page.click(".form-check-input", {
             waitUntil: "networkidle0",
         });
     },
-    getResults: async (boundry = null) => {
+    getResults: async (boundary = null) => {
         let elements; // = await self.page.$$(".ecom-card-sm");
         let results = [];
         await self.page
@@ -47,15 +49,17 @@ const self = {
             .then((elements = await self.page.$$(".ecom-card-sm")))
             .then(console.log(`selected: ${elements}`))
             .then(async () => {
-                if (boundry)
-                    boundry =
-                        boundry.toUpperCase()[0] +
-                        boundry.slice(1).toLowerCase();
+                await self.verifyExpress(elements);
+                if (boundary)
+                    boundary =
+                        boundary.toUpperCase()[0] +
+                        boundary.slice(1).toLowerCase();
 
                 for (let element of elements) {
-                    let partNum = await element.$eval(".font-weight-normal", (node) => node.innerText.trim());
                     let partDesc = await element.$eval(".card-text > span", (node) => node.innerText.trim());
-                    console.log(`PATH: ${typeof(partNum)}: ${partNum.length}`);
+                    if (boundary && !partDesc.includes(boundary)) continue;
+
+                    let partNum = await element.$eval(".font-weight-normal", (node) => node.innerText.trim());
                     let list = {
                         partNum,
                         partDesc
@@ -65,10 +69,20 @@ const self = {
                 }
             });
 
-        // await self.browser.close();
+        await self.browser.close();
+        console.table(results);
         return results;
     },
-    processBoundry: async (partDesc, boundry) => {},
+    verifyExpress: async (elements) => {    // this isn't working correctly
+        console.log('verifying all parts in stock...')
+        try {
+            await elements[0].$eval(`img[style="width: 75px;"]`)
+        } catch (e) {
+            console.log('FAILED, unable to confirm stock');
+            return;
+        }
+        console.log('SUCCESS, all parts in stock')
+    },
 };
 
 module.exports = self;
