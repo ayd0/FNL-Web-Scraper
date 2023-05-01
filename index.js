@@ -9,4 +9,13 @@ const BOUNDARY = null;
     let results = await fnl_scraper.getResults(BOUNDARY);
 
     debugger;
-})();
+});//();
+
+const crawl = async (searchStr) => {
+    await fnl_scraper.initialize(productCypher(searchStr));
+
+    let results = await fnl_scraper.getResults(BOUNDARY);
+    return results;
+}
+
+module.exports = crawl;
