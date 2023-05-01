@@ -1,3 +1,5 @@
+// TODO: 
+//      - setup for external access
 const express = require("express");
 const morgan = require("morgan");
 const mainRouter = require("./server/mainRouter");
