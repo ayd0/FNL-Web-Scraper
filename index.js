@@ -9,7 +9,7 @@ const BOUNDARY = null;
     let results = await fnl_scraper.getResults(BOUNDARY);
 
     debugger;
-});//();
+});//(); // uncomment for non-server build
 
 const crawl = async (searchStr) => {
     await fnl_scraper.initialize(productCypher(searchStr));

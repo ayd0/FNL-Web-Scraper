@@ -31,7 +31,7 @@ mainRouter
     .post(async (req, res) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.write(`Received search request: ${req.body.search}\nSearching...\n`);
+        // res.write(`Received search request: ${req.body.search}\nSearching...\n`);
         res.end(JSON.stringify(await crawl(req.body.search)));
     });
 
