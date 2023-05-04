@@ -6,6 +6,7 @@ const loadingAlert = document.querySelector('#loading-alert');
 const searchResults = document.querySelector("#searchResults")
 
 const handleSearchBtn = () => {
+    searchBtn.classList.add('disabled');
     // deactivate until data received
     if (searchInp.value === "") return;
     const req = JSON.stringify({ search: searchInp.value }, null, 2);
@@ -37,6 +38,7 @@ const injectResults = (results) => {
         );
         return;
     }
+    handleClearBtn();
     for (result of results) {
         const li = document.createElement('li');
         li.innerText = `${result.partNum}: ${result.partDesc}`

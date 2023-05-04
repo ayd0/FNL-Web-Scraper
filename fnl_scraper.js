@@ -9,6 +9,11 @@ const LOC_PAGE = `${MAIN_PAGE}/locations/details/WAFER`;
 const PART_DESCRIPTION = (fnl) => `${MAIN_PAGE}product?query=${fnl}`;
 const EXPRESS_SRC = `${MAIN_PAGE}catalog/static/3a364d147bed98729cc3.png`;
 
+process.on('uncaughtException', err => {
+    console.error(err);
+    console.log("Node NOT Exiting...");
+});
+
 const self = {
     browser: null,
     page: null,
