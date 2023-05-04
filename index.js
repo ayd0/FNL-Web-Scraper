@@ -18,4 +18,13 @@ const crawl = async (searchStr) => {
     return results;
 }
 
-module.exports = crawl;
+const getAll = async () => {
+    await fnl_scraper.initialize();
+}
+
+const scrapers = {
+    crawl: crawl,
+    getAll: getAll
+};
+
+module.exports = scrapers;

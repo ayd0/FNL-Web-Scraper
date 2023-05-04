@@ -1,12 +1,14 @@
 // TODO: 
 //       - convert results to XML format and POST
 //       - certify location updated
+//       - handle case where multiple initialization requests are made simulataneously 
 
 const puppeteer = require("puppeteer");
 
 const MAIN_PAGE = "https://fastenal.com/";
-const LOC_PAGE = `${MAIN_PAGE}/locations/details/WAFER`;
+const LOC_PAGE = `${MAIN_PAGE}locations/details/WAFER`;
 const PART_DESCRIPTION = (fnl) => `${MAIN_PAGE}product?query=${fnl}`;
+const CATEGORY_DESCRIPTION = (category) => `${MAIN_PAGE}product/${category}`;
 const EXPRESS_SRC = `${MAIN_PAGE}catalog/static/3a364d147bed98729cc3.png`;
 
 process.on('uncaughtException', err => {
@@ -18,16 +20,21 @@ const self = {
     browser: null,
     page: null,
 
-    initialize: async (fnl) => {
+    initialize: async (fnl=null) => {
         self.browser = await puppeteer.launch({
             headless: false,
         });
         await self.postLoc();
 
-        await self.page.goto(PART_DESCRIPTION(fnl), {
-            waitUntil: "networkidle0",
-        });
-        await self.setExpressIndicator();
+        if (fnl) {    // this chain is for testing
+            await self.page.goto(PART_DESCRIPTION(fnl), {
+                waitUntil: "networkidle0",
+            });
+            await self.setExpressIndicator();
+        } else {
+            console.log("non FNL")
+            await self.page.goto(CATEGORY_DESCRIPTION('Fasteners'));
+        }
     },
     postLoc: async () => {
         console.log('updating location...')
@@ -88,6 +95,10 @@ const self = {
         }
         console.log('SUCCESS, all parts in stock')
     },
+    getCategoryResults: async () => {
+        let categories = [];
+
+    }
 };
 
 module.exports = self;

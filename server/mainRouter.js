@@ -1,5 +1,5 @@
 const express = require("express");
-const crawl = require("../index");
+const fnl_scraper = require("../index");
 const fs = require('fs');
 const path = require('path');
 const mainRouter = express.Router();
@@ -34,7 +34,9 @@ mainRouter
     .post(async (req, res) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(await crawl(req.body.search)));
+        req.body.getAll 
+            ? res.end(JSON.stringify(await fnl_scraper.getAll()))
+            : res.end(JSON.stringify(await fnl_scraper.crawl(req.body.search)));
     });
 
 module.exports = mainRouter;
