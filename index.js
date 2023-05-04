@@ -12,7 +12,7 @@ const BOUNDARY = null;
 });//(); // uncomment for non-server build
 
 const crawl = async (searchStr) => {
-    await fnl_scraper.initialize(productCypher(searchStr));
+    await fnl_scraper.initialize(productCypher(searchStr), fnl_scraper.postLoc);
 
     let results = await fnl_scraper.getResults(BOUNDARY);
     return results;
@@ -20,6 +20,9 @@ const crawl = async (searchStr) => {
 
 const getAll = async () => {
     await fnl_scraper.initialize();
+    await fnl_scraper.getCategoryResults();
+
+    return null;
 }
 
 const scrapers = {

@@ -1,7 +1,7 @@
-// TODO: 
+// TODO:
 //       - convert results to XML format and POST
 //       - certify location updated
-//       - handle case where multiple initialization requests are made simulataneously 
+//       - handle case where multiple initialization requests are made simulataneously
 
 const puppeteer = require("puppeteer");
 
@@ -11,7 +11,7 @@ const PART_DESCRIPTION = (fnl) => `${MAIN_PAGE}product?query=${fnl}`;
 const CATEGORY_DESCRIPTION = (category) => `${MAIN_PAGE}product/${category}`;
 const EXPRESS_SRC = `${MAIN_PAGE}catalog/static/3a364d147bed98729cc3.png`;
 
-process.on('uncaughtException', err => {
+process.on("uncaughtException", (err) => {
     console.error(err);
     console.log("Node NOT Exiting...");
 });
@@ -20,32 +20,34 @@ const self = {
     browser: null,
     page: null,
 
-    initialize: async (fnl=null) => {
+    initialize: async (fnl = null, updateLoc = null) => {
         self.browser = await puppeteer.launch({
             headless: false,
         });
-        await self.postLoc();
+        self.page = await self.browser.newPage();
 
-        if (fnl) {    // this chain is for testing
+        if (updateLoc) await updateLoc();
+
+        if (fnl) {
+            // this chain is for testing
             await self.page.goto(PART_DESCRIPTION(fnl), {
                 waitUntil: "networkidle0",
             });
             await self.setExpressIndicator();
         } else {
-            console.log("non FNL")
-            await self.page.goto(CATEGORY_DESCRIPTION('Fasteners'));
+            console.log("non FNL");
+            await self.page.goto(CATEGORY_DESCRIPTION("Fasteners"));
         }
     },
     postLoc: async () => {
-        console.log('updating location...')
-        self.page = await self.browser.newPage();
+        console.log("updating location...");
         await self.page.goto(LOC_PAGE, {
             waitUntil: "networkidle0",
         });
         await self.page.click(".js-setStore", {
             waitUntil: "networkidle0",
         });
-        console.log('location updated')
+        console.log("location updated");
     },
     setExpressIndicator: async () => {
         await self.page.click(".form-check-input", {
@@ -68,13 +70,19 @@ const self = {
                         boundary.slice(1).toLowerCase();
 
                 for (let element of elements) {
-                    let partDesc = await element.$eval(".card-text > span", (node) => node.innerText.trim());
+                    let partDesc = await element.$eval(
+                        ".card-text > span",
+                        (node) => node.innerText.trim()
+                    );
                     if (boundary && !partDesc.includes(boundary)) continue;
 
-                    let partNum = await element.$eval(".font-weight-normal", (node) => node.innerText.trim());
+                    let partNum = await element.$eval(
+                        ".font-weight-normal",
+                        (node) => node.innerText.trim()
+                    );
                     let list = {
                         partNum,
-                        partDesc
+                        partDesc,
                     };
 
                     results.push(list);
@@ -85,20 +93,22 @@ const self = {
         console.table(results);
         return results;
     },
-    verifyExpress: async (elements) => {    // this isn't working correctly
-        console.log('verifying all parts in stock...')
+    verifyExpress: async (elements) => {
+        // this isn't working correctly
+        console.log("verifying all parts in stock...");
         try {
-            await elements[0].$eval(`img[style="width: 75px;"]`)
+            await elements[0].$eval(`img[style="width: 75px;"]`);
         } catch (e) {
-            console.log('FAILED, unable to confirm stock');
+            console.log("FAILED, unable to confirm stock");
             return;
         }
-        console.log('SUCCESS, all parts in stock')
+        console.log("SUCCESS, all parts in stock");
     },
     getCategoryResults: async () => {
         let categories = [];
 
-    }
+        await self.browser.close();
+    },
 };
 
 module.exports = self;
